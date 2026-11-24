@@ -56,55 +56,42 @@ export const Home: React.FC<HomeProps> = ({ settings, darkMode }) => {
     setLoading(true);
     setAnswerResult(null);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
-      const apiKey =
-        (import.meta as any).env?.VITE_GEMINI_API_KEY ||
-        (import.meta as any).env?.GEMINI_API_KEY ||
-        (typeof process !== 'undefined' ? (process as any).env?.GEMINI_API_KEY : '');
+      const workerUrl = 'https://universalaiworker.mdsabbir1254783.workers.dev';
 
-      if (!apiKey) {
-        setAnswerResult('Error: Gemini API key missing. Netlify Environment Variables mein VITE_GEMINI_API_KEY set karein.');
-        return;
-      }
-
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [
-              {
-                parts: [
-                  {
-                    text: `Subject: ${selectedSubject}\nQuestion: ${prompt}\nAnswer clearly and helpfully.`,
-                  },
-                ],
-              },
-            ],
-          }),
-        }
-      );
+      const res = await fetch(workerUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          subject: selectedSubject,
+          prompt: prompt,
+        }),
+      });
 
       const data = await res.json();
+
       if (!res.ok) {
-        setAnswerResult('Error: ' + (data?.error?.message || 'Failed to get AI response'));
+        setAnswerResult('Error: ' + (data?.error || 'Failed to get Cloudflare AI response'));
         return;
       }
 
-      const text =
-        data?.candidates?.[0]?.content?.parts
-          ?.map((p: { text?: string }) => p.text || '')
-          .join('')
-          .trim() || 'No response received.';
-
-      setAnswerResult(text);
+      setAnswerResult(data?.answer || 'No response received.');
     } catch (err: any) {
-      setAnswerResult('Network error: ' + (err?.message || 'Unknown error'));
+      if (err?.name === 'AbortError') {
+        setAnswerResult('Request timed out (15s). Dobara try karein.');
+      } else {
+        setAnswerResult('Network error: ' + (err?.message || 'Unknown error'));
+      }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
+
 
 
   const getCategoryIcon = (iconName: string) => {
