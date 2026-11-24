@@ -1,0 +1,6 @@
+{
+  "name": "Gyan AI - Universal AI Education & Knowledge Portal",
+  "description": "A professional all-in-one AI education portal where users can ask questions on any subject, language, or topic, backed by Cloudflare AI model @cf/meta/llama-3.1-8b-instruct-fp8-fast, dynamic admin dashboard, quizzes, translation tools, and editable knowledge pages.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
