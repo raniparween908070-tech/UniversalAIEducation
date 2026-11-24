@@ -57,23 +57,55 @@ export const Home: React.FC<HomeProps> = ({ settings, darkMode }) => {
     setAnswerResult(null);
 
     try {
-      const res = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, subject: selectedSubject })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setAnswerResult(data.answer);
-      } else {
-        setAnswerResult('Error: ' + (data.error || 'Failed to get answer'));
+      const apiKey =
+        (import.meta as any).env?.VITE_GEMINI_API_KEY ||
+        (import.meta as any).env?.GEMINI_API_KEY ||
+        (typeof process !== 'undefined' ? (process as any).env?.GEMINI_API_KEY : '');
+
+      if (!apiKey) {
+        setAnswerResult('Error: Gemini API key missing. Netlify Environment Variables mein VITE_GEMINI_API_KEY set karein.');
+        return;
       }
+
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: `Subject: ${selectedSubject}\nQuestion: ${prompt}\nAnswer clearly and helpfully.`,
+                  },
+                ],
+              },
+            ],
+          }),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) {
+        setAnswerResult('Error: ' + (data?.error?.message || 'Failed to get AI response'));
+        return;
+      }
+
+      const text =
+        data?.candidates?.[0]?.content?.parts
+          ?.map((p: { text?: string }) => p.text || '')
+          .join('')
+          .trim() || 'No response received.';
+
+      setAnswerResult(text);
     } catch (err: any) {
-      setAnswerResult('Network error: ' + err.message);
+      setAnswerResult('Network error: ' + (err?.message || 'Unknown error'));
     } finally {
       setLoading(false);
     }
   };
+
 
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
