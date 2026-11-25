@@ -149,7 +149,7 @@ export const UniversalChat: React.FC<UniversalChatProps> = ({ darkMode }) => {
 
     try {
 const res = await fetch('https://universal-chat-api.mdsabbir1254783.workers.dev', {
-
+method: 'POST',
 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: userMsgText, subject, language })
