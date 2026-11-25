@@ -99,25 +99,6 @@ export const Footer: React.FC<FooterProps> = ({ settings, darkMode }) => {
             </ul>
           </div>
 
-          {/* Column 4: Contact Info */}
-          <div>
-            <h3 className="text-white font-semibold text-base mb-4">Contact Information</h3>
-            <ul className="space-y-3 text-sm text-slate-400">
-              <li className="flex items-start gap-2.5">
-                <MapPin className="w-4 h-4 text-indigo-400 shrink-0 mt-1" />
-                <span>{settings.contactAddress || 'Knowledge Tower, New Delhi, India'}</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span>{settings.contactEmail || 'support@gyanai.edu'}</span>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Phone className="w-4 h-4 text-indigo-400 shrink-0" />
-                <span>{settings.contactPhone || '+91 98765 43210'}</span>
-              </li>
-            </ul>
-          </div>
-
         </div>
 
         {/* Bottom Bar */}
