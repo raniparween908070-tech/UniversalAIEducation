@@ -148,7 +148,8 @@ export const UniversalChat: React.FC<UniversalChatProps> = ({ darkMode }) => {
     let sessionTitle = userMsgText.substring(0, 30) + '...';
 
     try {
-const res = await fetch('https://universal-translate-api.mdsabbir1254783.workers.dev', {
+const res = await fetch('https://universal-chat-api.mdsabbir1254783.workers.dev', {
+
 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: userMsgText, subject, language })
