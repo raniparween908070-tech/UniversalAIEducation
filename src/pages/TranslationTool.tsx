@@ -41,22 +41,36 @@ export const TranslationTool: React.FC<TranslationToolProps> = ({ darkMode }) =>
     setLoading(true);
     setTranslatedText('');
 
-    try {
-      const res = await fetch('/api/ai/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, sourceLang, targetLang })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setTranslatedText(data.translation);
-      } else {
-        setTranslatedText('Error: ' + (data.error || 'Translation failed'));
-      }
-    } catch (err: any) {
-      setTranslatedText('Network error: ' + err.message);
-    } finally {
-      setLoading(false);
+try {
+        const res = await fetch('/api/ai/translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: sourceText, sourceLang, targetLang }),
+        });
+
+        const rawText = await res.text();
+
+        if (!res.ok) {
+          setTranslatedText(`Error (${res.status}): ${rawText || 'Server error'}`);
+          return;
+        }
+
+        if (!rawText.trim()) {
+          setTranslatedText('Error: Server se khali response aaya');
+          return;
+        }
+
+        const data = JSON.parse(rawText);
+        if (data.success && data.translation) {
+          setTranslatedText(data.translation);
+        } else {
+          setTranslatedText('Error: ' + (data.error || 'Translation failed'));
+        }
+      } catch (err: any) {
+        setTranslatedText('Network error: ' + err.message);
+      } finally {
+        setLoading(false);
+}
     }
   };
 
