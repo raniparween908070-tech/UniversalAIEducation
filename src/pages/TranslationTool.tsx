@@ -42,7 +42,7 @@ export const TranslationTool: React.FC<TranslationToolProps> = ({ darkMode }) =>
     setTranslatedText('');
 
     try {
-      const res = await fetch('/api/ai/translate', {
+const res = await fetch('https://universal-translate-api.mdsabbir1254783.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, sourceLang, targetLang }),
